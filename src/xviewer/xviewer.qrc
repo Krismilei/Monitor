@@ -1,0 +1,10 @@
+<RCC>
+  <qresource prefix="XViewer">
+    <file>img/cam.png</file>
+    <file>img/close.png</file>
+    <file>img/max.png</file>
+    <file>img/min.png</file>
+    <file>img/normal.png</file>
+    <file>img/xv.ico</file>
+  </qresource>
+</RCC>
