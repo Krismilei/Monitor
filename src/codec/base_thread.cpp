@@ -44,17 +44,17 @@ void BaseThread::Start()
 
 void BaseThread::Stop()
 {
-	string str = "Thread::Stop() Begin ";
-	str += index_;
-	LOGINFO(str.c_str());
+	//string str = "Thread::Stop() Begin ";
+	//str += index_;
+	//LOGINFO(str.c_str());
 	is_exit_ = true;
 	if (th_.joinable())//判断子线程是否可以等待
 	{
 		th_.join();//等待子线程退出
 	}
-	str = "Thread::Stop() End ";
-	str += index_;
-	LOGINFO(str.c_str());
+	//str = "Thread::Stop() End ";
+	//str += index_;
+	//LOGINFO(str.c_str());
 }
 
 void BaseThread::Next(AVPacket* pkt)

@@ -80,7 +80,7 @@ void MuxThread::Main()
 
         xmux_.Write(pkt);
         av_packet_free(&pkt);
-        cout << "W";
+        //cout << "W";
         this_thread::sleep_for(1ms);
     }
     xmux_.WriteEnd();

@@ -2,7 +2,6 @@
 #include <fstream>
 using namespace std;
 
-//插入摄像机 线程安全
 void XCameraConfig::Push(const XCameraData& data)
 {
     unique_lock<mutex> lock(mux_);

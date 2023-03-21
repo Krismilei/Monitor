@@ -1,6 +1,5 @@
 #include "xviewer.h"
 #include <QMouseEvent>
-
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QResizeEvent>
@@ -38,33 +37,28 @@ struct XCamVideo
 };
 static map<QDate, vector<XCamVideo> > cam_videos;
 
-void XViewer::SelectCamera(QModelIndex index)//选择摄像机
+void XViewer::SelectCamera(QModelIndex index)
 {
     qDebug() << "SelectCamera" << index.row();
     auto conf = XCameraConfig::Instance();
-    auto cam = conf->GetCam(index.row()); //获取相机参数
+    auto cam = conf->GetCam(index.row()); 
     if (cam.name[0] == '\0')
     {
         return;
     }
-    //相机视频存储路径
     stringstream ss;
     ss << cam.save_path << "/" << index.row() << "/";
 
-    //遍历此目录
     QDir dir(C(ss.str().c_str()));
     if (!dir.exists())
         return;
-    //获取目录下文件列表
     QStringList filters;
     filters << "*.mp4" << "*.avi";
     dir.setNameFilters(filters);//筛选
 
-    //清理其他相机的数据
     ui.cal->ClearDate();
     cam_videos.clear();
 
-    //所有文件列表
     auto files = dir.entryInfoList();
     for (auto file : files)
     {
@@ -74,11 +68,9 @@ void XViewer::SelectCamera(QModelIndex index)//选择摄像机
         //去掉cam_ 和 .mp4
         auto tmp = filename.left(filename.size() - 4);
         tmp = tmp.right(tmp.length() - 4);
-        //2020_09_04_17_54_58
         auto dt = QDateTime::fromString(tmp,"yyyy_MM_dd_hh_mm_ss");
         qDebug() << dt.date();
         ui.cal->AddDate(dt.date());
-        //qDebug() << file.fileName();
 
         XCamVideo video;
         video.datetime = dt;
@@ -91,7 +83,7 @@ void XViewer::SelectCamera(QModelIndex index)//选择摄像机
     ui.cal->showPreviousMonth();
 }
 
-void XViewer::SelectDate(QDate date)        //选择日期
+void XViewer::SelectDate(QDate date)    
 {
     qDebug() << "SelectDate" << date.toString();
     auto dates = cam_videos[date];
@@ -99,13 +91,11 @@ void XViewer::SelectDate(QDate date)        //选择日期
     for (auto d : dates)
     {
         auto item = new QListWidgetItem(d.datetime.time().toString());
-
-        //item 添加自定义数据 文件路径
         item->setData(Qt::UserRole, d.filepath);
         ui.time_list->addItem(item);
     }
 }
-void XViewer::PlayVideo(QModelIndex index)  //选择时间播放视频
+void XViewer::PlayVideo(QModelIndex index)
 {
     qDebug() << "PlayVideo" << index.row();
     auto item = ui.time_list->currentItem();
@@ -138,22 +128,17 @@ void XViewer::View16()
 void XViewer::View(int count)
 {
     qDebug() << "View" <<count;
-    // 2X2 3X3 4X4
-    //确定列数 根号
     int cols = sqrt(count);
-    //总窗口数量
     int wid_size = sizeof(cam_wids) / sizeof(QWidget*);
 
-    //初始化布局器
     auto lay = (QGridLayout*)ui.cams->layout();
     if (!lay)
     {
         lay = new QGridLayout();
         lay->setContentsMargins(0, 0, 0, 0);
-        lay->setSpacing(2);//元素间距
+        lay->setSpacing(2);
         ui.cams->setLayout(lay);
     }
-    //初始化窗口
     for (int i = 0; i < count; i++)
     {
         if (!cam_wids[i])
@@ -164,7 +149,6 @@ void XViewer::View(int count)
         lay->addWidget(cam_wids[i],i/ cols,i%cols);
     }
 
-    //清理多余的窗体
     for (int i = count; i < wid_size; i++)
     {
         if (cam_wids[i])
@@ -175,28 +159,25 @@ void XViewer::View(int count)
     }
 }
 
-//定时器渲染视频 回调函数
 void XViewer::timerEvent(QTimerEvent* ev)
 {
-    //总窗口数量
     int wid_size = sizeof(cam_wids) / sizeof(QWidget*);
     for (int i = 0; i < wid_size; i++)
     {
         if (cam_wids[i])
         {
-            //渲染多窗口视频
             cam_wids[i]->Draw();
         }
     }
 
 }
 
-void XViewer::StartRecord() //开始全部摄像头录制
+void XViewer::StartRecord() 
 {
     StopRecord();
     qDebug() << "开始全部摄像头录制";
     ui.status->setText(C("录制中。。。"));
-    //获取配置列表 
+
     auto conf = XCameraConfig::Instance();
     int count = conf->GetCamCount();
     for (int i = 0; i < count; i++)
@@ -215,10 +196,8 @@ void XViewer::StartRecord() //开始全部摄像头录制
         records.push_back(rec);
     }
 
-    //创建录制目录
-    //分别开始录制线程
 }
-void XViewer::StopRecord()  //停止全部摄像头录制
+void XViewer::StopRecord() 
 {
     ui.status->setText(C("监控中。。。"));
     for (auto rec : records)
@@ -242,8 +221,6 @@ void XViewer::SetCam(int index)
     dlg.resize(800, 200);
     QFormLayout lay;
     dlg.setLayout(&lay);
-    //  标题1 输入框1
-    //  标题2 输入框2
     QLineEdit name_edit;
     lay.addRow(C("名称"), &name_edit);
 
@@ -276,7 +253,7 @@ void XViewer::SetCam(int index)
 
     for (;;)
     {
-        if (dlg.exec() == QDialog::Accepted) //点击了保存
+        if (dlg.exec() == QDialog::Accepted)
         {
             if (name_edit.text().isEmpty())
             {
@@ -308,16 +285,16 @@ void XViewer::SetCam(int index)
     strcpy(data.url, url_edit.text().toLocal8Bit());
     strcpy(data.sub_url, sub_url_edit.text().toLocal8Bit());
     strcpy(data.save_path, save_path_edit.text().toLocal8Bit());
-    if (index >= 0) //修改
+    if (index >= 0) 
     {
         c->SetCam(index, data);
     }
-    else //新增
+    else 
     {
-        c->Push(data);  //插入数据
+        c->Push(data);  
     }
-    c->Save(CAM_CONF_PATH); //保存到文件
-    RefreshCams();  //刷新显示
+    c->Save(CAM_CONF_PATH);
+    RefreshCams();  
 }
 void XViewer::SetCam()
 {
@@ -389,37 +366,22 @@ XViewer::XViewer(QWidget *parent)
     : QWidget(parent)
 {
     ui.setupUi(this);
-
-    //去除原窗口边框
     setWindowFlags(Qt::FramelessWindowHint);
-
     //布局head和body 垂直布局器
     auto vlay = new QVBoxLayout();
-    //边框间距
     vlay->setContentsMargins(0, 0, 0, 0);
-    //元素间距
     vlay->setSpacing(0);
     vlay->addWidget(ui.head);
     vlay->addWidget(ui.body);
     this->setLayout(vlay);
 
-    //相机列表 和相机预览
-    //水平布局器
     auto hlay = new QHBoxLayout();
     ui.body->setLayout(hlay);
-    //边框间距
     hlay->setContentsMargins(0, 0, 0, 0);
-    hlay->addWidget(ui.left);   //左侧相机列表
-    hlay->addWidget(ui.cams);   //右侧预览窗口
-    hlay->addWidget(ui.playback_wid);//回放窗口
+    hlay->addWidget(ui.left);   
+    hlay->addWidget(ui.cams);   
+    hlay->addWidget(ui.playback_wid);
 
-
-
-
-    //////////////////////////////////////
-    /// 初始化右键菜单
-    // 视图=》  1 窗口
-    //          4 窗口
     auto m = left_menu_.addMenu(C("视图"));
     auto a = m->addAction(C("1窗口"));
     connect(a, SIGNAL(triggered()), this, SLOT(View1()));
@@ -433,10 +395,9 @@ XViewer::XViewer(QWidget *parent)
     connect(a, SIGNAL(triggered()), this, SLOT(StartRecord()));
     a = left_menu_.addAction(C("全部停止录制"));
     connect(a, SIGNAL(triggered()), this, SLOT(StopRecord()));
-    //默认九窗口
-    View9();
+    //默认4窗口
+    View4();
 
-    //刷新左侧摄像机列表
     XCameraConfig::Instance()->Load(CAM_CONF_PATH);
 
     ui.time_list->clear();
@@ -444,7 +405,7 @@ XViewer::XViewer(QWidget *parent)
 
     //启动定时器渲染视频
     startTimer(1);
-    Preview();//默认显示预览
+    Preview();
 }
 void XViewer::MaxWindow()
 {
@@ -458,15 +419,13 @@ void XViewer::NormalWindow()
     ui.normal->setVisible(false);
     showNormal();
 }
-//窗口大小发生编码
+
 void XViewer::resizeEvent(QResizeEvent* ev)
 {
     int x = width() - ui.head_button->width();
     int y = ui.head_button->y();
     ui.head_button->move(x, y);
 }
-
-// 鼠标拖动窗口
 
 static bool mouse_press = false;
 static QPoint mouse_point;

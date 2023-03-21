@@ -38,18 +38,18 @@ public slots:
     void View4();
     void View9();
     void View16();
-    void AddCam();  //新增摄像机配置
-    void SetCam();  //
-    void DelCam();  //
+    void AddCam(); 
+    void SetCam();  
+    void DelCam();  
 
-    void StartRecord(); //开始全部摄像头录制
-    void StopRecord();  //停止全部摄像头录制
-    void Preview();//预览界面
-    void Playback();//回放界面
+    void StartRecord(); 
+    void StopRecord();  
+    void Preview();
+    void Playback();
 
-    void SelectCamera(QModelIndex index);//选择摄像机
-    void SelectDate(QDate date);        //选择日期
-    void PlayVideo(QModelIndex index);  //选择时间播放视频
+    void SelectCamera(QModelIndex index);
+    void SelectDate(QDate date);        
+    void PlayVideo(QModelIndex index);  
 private:
     Ui::XViewerClass ui;
     QMenu left_menu_;

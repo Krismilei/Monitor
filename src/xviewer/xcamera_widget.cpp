@@ -9,7 +9,7 @@
 #include "decode_thread.h"
 #include "sdl.h"
 #include "xcamera_config.h"
-//渲染
+
 void XCameraWidget::paintEvent(QPaintEvent* p)
 {
     //渲染样式表
@@ -30,7 +30,7 @@ void XCameraWidget::dragEnterEvent(QDragEnterEvent* e)
     //接收拖拽进入
     e->acceptProposedAction();
 }
-//渲染视频
+
 void XCameraWidget::Draw()
 {
     if (!demux_ || !decode_ || !view_)return;
@@ -40,7 +40,6 @@ void XCameraWidget::Draw()
     FreeFrame(&f);
 }
 
-//清理资源
 XCameraWidget::~XCameraWidget()
 {
     if (demux_)
@@ -69,28 +68,24 @@ bool XCameraWidget::Open(const char* url)
         demux_->Stop();
     if (decode_)
         decode_->Stop();
-    //打开解封装线程
     demux_ = new DemuxThread();
     if (!demux_->Open(url))
     {
         return false;
     }
-    //打开视频解码器线程
     decode_ = new DecodeThread();
     auto para = demux_->CopyVideoPara();
     if (!decode_->Open(para->para))
     {
         return false;
     }
-    //设定解码线程接收解封装数据
+
     demux_->set_next(decode_);
 
-    //初始化渲染参数
     view_ = new SDL();
     view_->set_win_id((void*)winId());
     view_->Init(para->para);
 
-    //启动解封装和解码线程
     demux_->Start();
     decode_->Start();
     return true;

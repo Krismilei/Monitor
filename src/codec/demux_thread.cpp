@@ -37,7 +37,7 @@ void DemuxThread::Main()
 			continue;
 		}
 		//读取成功打印|
-		cout << "|";
+		//cout << "|";
 		Next(pkt);
 		//this_thread::sleep_for(1ms);
 		//注意这里要引用计数减一！

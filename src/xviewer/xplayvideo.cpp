@@ -9,7 +9,6 @@ void XPlayVideo::timerEvent(QTimerEvent* ev)
 }
 void XPlayVideo::Close()
 {
-    //关闭上次数据
     demux_.Stop();
     decode_.Stop();
     if (view_)
@@ -27,14 +26,14 @@ void XPlayVideo::closeEvent(QCloseEvent* ev)
 bool XPlayVideo::Open(const char* url)
 {
 
-    if (!demux_.Open(url)) //解封装
+    if (!demux_.Open(url))
     {
         return false;
     }
     auto vp = demux_.CopyVideoPara();
     if (!vp)
         return false;
-    if (!decode_.Open(vp->para))//解码
+    if (!decode_.Open(vp->para))
     {
         return false;
     }
@@ -43,7 +42,7 @@ bool XPlayVideo::Open(const char* url)
     if (!view_)
         view_ = new SDL();
     view_->set_win_id((void*)winId());
-    if (!view_->Init(vp->para)) //SDL渲染
+    if (!view_->Init(vp->para)) 
         return false;
     demux_.set_syn_type(SYN_VIDEO);
     demux_.Start();

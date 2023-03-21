@@ -31,7 +31,7 @@ bool DecodeThread::Open(AVCodecParameters* para)
 
 void DecodeThread::Do(AVPacket* pkt)
 {
-    cout << "#";
+    //cout << "#";
     if (!pkt || pkt->stream_index != 0)//暂时仅处理视频
     {
         return;
@@ -70,7 +70,7 @@ void DecodeThread::Main()
             {
                 need_view_ = true;
             }
-            cout << "@";
+            //cout << "@";
         }
         
         //sleep不能放在锁里
