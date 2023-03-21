@@ -36,7 +36,6 @@ bool SDL::Init(int w, int h, void* win_id, forma fmt)
     //初始化SDL 视频库
     InitVideo();
 
-    //确保线程安全
     unique_lock<mutex> sdl_lock(mux_);
     width_ = w;
     height_ = h;
@@ -81,9 +80,9 @@ bool SDL::Init(int w, int h, void* win_id, forma fmt)
 
     //创建材质 （显存）
     texture_ = SDL_CreateTexture(render_,
-        SDL_PIXELFORMAT_IYUV,                        //像素格式
+        SDL_PIXELFORMAT_IYUV,           
         SDL_TEXTUREACCESS_STREAMING,    //频繁修改的渲染（带锁）
-        w, h                            //材质大小
+        w, h                            
     );
     if (!texture_)
     {
